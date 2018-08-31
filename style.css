@@ -1,0 +1,15 @@
+.canvas--container {
+  display: flex;
+  border: solid 2px red;
+}
+
+.canvas {
+  border: solid 1px blue;
+  display: flex;
+}
+
+.pixel {
+  border: solid 1px green;
+  height: 30px;
+  width: 30px;
+}
