@@ -1,112 +1,154 @@
 
-const SZ_CANVAS = 10;
-const COLOR_EMPTY = "white";
-let aCanvas = [];
+/* =================================================
+*  GLOBALS
+*  ================================================= */
+
+// canvas will be SZ_CANVAS x SZ_CANVAS "pixels"
+const SZ_CANVAS = 25;
+
+// default background color for canvas when initialized
+const DEFAULT_COLOR = "white";
+
+// model of the canvas, stores the color for each pixel
+const aCanvas = [];
+
+// the palette of colors user can choose from
 let aPalette = ['white', 'black', 'grey', 'yellow', 'red', 'blue', 'green',
   'brown', 'pink', 'orange', 'purple'];
 
+// the current color selection
+let sCurrColor = 'black';
+
 /* =================================================
-*  getElemCanvas()
+*  getCanvasElem()
 *  ================================================= */
-function getElemCanvas() {
+function getCanvasElem() {
   return document.getElementById('canvas');
 }
 
 /* =================================================
-*  getElemPalette()
+*  getPaletteElem()
 *  ================================================= */
-function getElemPalette() {
+function getPaletteElem() {
   return document.getElementById('palette');
 }
 
 /* =================================================
-*  createElemPixel()
+*  createPixelElem()
+*
+*  @param row,col--stored in data attributes
+*  @return new pixel element
 *  ================================================= */
-function createElemPixel(row, col) {
+function createPixelElem(row, col) {
   let elemPixel = document.createElement('div');
 
   elemPixel.classList.add('canvas--pixel');
   elemPixel.style.backgroundColor = aCanvas[row][col];
   elemPixel.dataset.row = row;
   elemPixel.dataset.col = col;
-  // elemPixel.innerText = `${row},${col}`;
 
   return elemPixel;
 }
 
 /* =================================================
-*  createElemRow()
+*  createRowElem()
+*
+*  @param row--row number being created
+*  @return new row of pixels element
 *  ================================================= */
-function createElemRow(row) {
+function createRowElem(row) {
   let elemRow = document.createElement('div');
   elemRow.classList.add("canvas--row");
   for (let col = 0; col < SZ_CANVAS; col++) {
-    elemRow.appendChild(createElemPixel(row, col));
+    elemRow.appendChild(createPixelElem(row, col));
   }
   return elemRow;
 }
 
 /* =================================================
 *  renderCanvas()
+*
+*  Regenerate the canvas from current state of aCanvas
 *  ================================================= */
 function renderCanvas() {
-  let elemCanvas = getElemCanvas();
+  let elemCanvas = getCanvasElem();
   elemCanvas.innerHTML = "";
   for (let row = 0; row < SZ_CANVAS; row++) {
-    elemCanvas.appendChild(createElemRow(row));
+    elemCanvas.appendChild(createRowElem(row));
   }
 }
 
 /* =================================================
-*  createElemPaletteColor()
+*  createPaletteColorElem()
+*
+*  Create a new palette color element to add to palette
+*
+*  @param sColor--"white", "red", etc
+*  @return palette color element
 *  ================================================= */
-function createElemPaletteColor(sColor) {
+function createPaletteColorElem(sColor) {
   let elemPaletteColor = document.createElement('div');
 
   elemPaletteColor.classList.add('palette--color');
-  elemPaletteColor.style.backgroundColor = aCanvas[row][col];
-  elemPaletteColor.dataset.row = row;
-  elemPaletteColor.dataset.col = col;
+  elemPaletteColor.style.backgroundColor = sColor;
+  elemPaletteColor.dataset.color = sColor;
 
   return elemPaletteColor;
 }
 
 /* =================================================
 *  renderPalette()
+*
+*  Regenerate the palette
 *  ================================================= */
 function renderPalette() {
-  let elemPalette = getElemPalette();
+  let elemPalette = getPaletteElem();
   elemPalette.innerHTML = "";
-  for (let color of aPalette) {
-    elemPalette.appendChild(createElemPaletteColor(color));
+  for (let sColor of aPalette) {
+    let elemPaletteColor = createPaletteColorElem(sColor);
+    if (sColor === sCurrColor) {
+      elemPaletteColor.classList.add("palette--color--curr");
+    }
+    elemPalette.appendChild(elemPaletteColor);
   }
-  // for (let idx = 0;  < SZ_CANVAS; row++) {
-  //   elemCanvas.appendChild(createElemRow(row));
-  // }
 }
 
 /* =================================================
 *  onclickCanvas()
+*
+*  Catch canvas clicks to set pixel to current color
 *  ================================================= */
-let iPal = 0;
 function onclickCanvas(e) {
-  // console.log(e.target);
-
+  // check that canvas click was on a pixel
   if (!e.target.classList.contains("canvas--pixel")) {
-    render();
+    renderCanvas();
     return;
   }
 
+  // get row and column from the data attributes in the pixel
   let { row, col } = e.target.dataset;
-  // console.log(`row,col: ${row}, ${col}`);
 
-  // aCanvas[row][col] = "red";
-  iPal = ((aPalette.length - 1) < ++iPal) ? 0 : iPal;
-  // console.log(`setting color:  ${aPalette[iPal]}`);
-  aCanvas[row][col] = aPalette[iPal];
+  aCanvas[row][col] = sCurrColor;
   e.target.style.backgroundColor = aCanvas[row][col];
+}
 
-  // elemPixel.style.backgroundColor = aCanvas[row][col];
+/* =================================================
+*  onclickPalette()
+*
+*  Catch palette clicks to set current color and re-render palette
+*  ================================================= */
+function onclickPalette(e) {
+  // check that palette click was on a palette color
+  if (!e.target.classList.contains("palette--color")) {
+    return;
+  }
+
+  // get color from the data attribute of the color
+  let { color } = e.target.dataset;
+
+  sCurrColor = color;
+
+  renderPalette();
 }
 
 /* =================================================
@@ -118,13 +160,14 @@ function init() {
   for (let row = 0; row < SZ_CANVAS; row++) {
     aCanvas[row] = [];
     for (let col = 0; col < SZ_CANVAS; col++) {
-      aCanvas[row][col] = COLOR_EMPTY;
+      aCanvas[row][col] = DEFAULT_COLOR;
     }
   }
 
   // setup event handlers
   // --------------------------
-  getElemCanvas().onclick = onclickCanvas;
+  getCanvasElem().onclick = onclickCanvas;
+  getPaletteElem().onclick = onclickPalette;
 }
 
 /* =================================================

@@ -1,27 +1,79 @@
 
+/* Use in div to center child element */
+.flex-center {
+  display: flex;
+  justify-content: center;
+}
+
+h1 {
+  margin-top: 15px;
+  margin-bottom: 0;
+
+  font-family: sans-serif;
+
+  text-align: center;
+}
+
+/* ============================
+*  CANVAS
+*  ============================*/
+
+/* entire canvas */
 .canvas {
-  /* border: solid 1px red; */
+  margin-top: 10px;
+  padding: 10px;
+
+  background-color: DarkGray;
+
+  border: solid 12px DarkSlateGray;
+  border-radius: 20px;
+  box-shadow: 5px 5px 10px grey;
 }
 
+/* row of pixels, flex so pixels appear next to each other */
 .canvas--row {
-  /* border: solid 1px blue; */
   display: flex;
   justify-content: center;
 }
 
+/* single pixel */
 .canvas--pixel {
+  height: 15px;
+  width:  15px;
   border: solid 1px LightGray;
-  height: 30px;
-  width:  30px;
 }
 
+/* ============================
+*  PALETTE
+*  ============================*/
+
+/* Entire palette */
 .palette {
+  margin-top: 15px;
+  padding: 8px;
+  width: 437px;
+
+  background-color: LightGray;
+
+  border: solid 4px black;
+  border-radius: 20px;
+  box-shadow: 5px 5px 10px grey;
+
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
+/* A color on the palette */
 .palette--color {
   border: solid 2px DarkGray;
-  height: 60px;
-  width:  60px;
+  height: 31px;
+  width:  31px;
+  margin-left: 4px;
+  border-radius: 50%;
+}
+/* Add class to mark current color */
+.palette--color--curr {
+  height: 50px;
+  width:  50px;
 }
