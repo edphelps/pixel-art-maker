@@ -1,15 +1,27 @@
-.canvas--container {
-  display: flex;
-  border: solid 2px red;
-}
 
 .canvas {
-  border: solid 1px blue;
-  display: flex;
+  /* border: solid 1px red; */
 }
 
-.pixel {
-  border: solid 1px green;
+.canvas--row {
+  /* border: solid 1px blue; */
+  display: flex;
+  justify-content: center;
+}
+
+.canvas--pixel {
+  border: solid 1px LightGray;
   height: 30px;
-  width: 30px;
+  width:  30px;
+}
+
+.palette {
+  display: flex;
+  justify-content: center;
+}
+
+.palette--color {
+  border: solid 2px DarkGray;
+  height: 60px;
+  width:  60px;
 }
