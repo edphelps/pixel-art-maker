@@ -27,7 +27,7 @@ h1 {
 
   border: solid 20px DimGray;
   border-radius: 15px;
-  box-shadow: 8px 8px 30px grey;
+  /* box-shadow: 8px 8px 30px grey; */
 }
 
 /* row of pixels, flex so pixels appear next to each other */
@@ -58,6 +58,7 @@ h1 {
   border: solid 4px black;
   border-radius: 20px;
   /* box-shadow: 5px 5px 10px grey; */
+  box-shadow: 8px 8px 30px grey;
 
   display: flex;
   justify-content: center;

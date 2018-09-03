@@ -24,7 +24,7 @@ const aPalette = ['white', 'black', 'grey', 'yellow', 'red', 'blue', 'green',
   'brown', 'pink', 'orange', 'purple'];
 
 // the current color selection
-let sCurrColor = 'black';
+let gsCurrColor = 'black';
 
 /* =================================================
 *  getCanvasElem()
@@ -112,7 +112,7 @@ function renderPalette() {
   // for (const sColor of aPalette) {
   aPalette.forEach((sColor) => {
     const elemPaletteColor = createPaletteColorElem(sColor);
-    if (sColor === sCurrColor) {
+    if (sColor === gsCurrColor) {
       elemPaletteColor.classList.add("palette--color--curr");
     }
     gelemPalette.appendChild(elemPaletteColor);
@@ -135,7 +135,7 @@ function onclickCanvas(e) {
   // get row and column from the data attributes in the pixel
   const { row, col } = e.target.dataset;
 
-  gaCanvas[row][col] = sCurrColor;
+  gaCanvas[row][col] = gsCurrColor;
   e.target.style.backgroundColor = gaCanvas[row][col];
 }
 
@@ -153,7 +153,7 @@ function onclickPalette(e) {
   // get color from the data attribute of the color
   const { color } = e.target.dataset;
 
-  sCurrColor = color;
+  gsCurrColor = color;
 
   renderPalette();
 }
@@ -170,19 +170,48 @@ function onmousemoveCanvas(e) {
     if (e.buttons) {
       // get row and column from the data attributes in the pixel
       const { row, col } = e.target.dataset;
-      gaCanvas[row][col] = sCurrColor;
+      gaCanvas[row][col] = gsCurrColor;
       e.target.style.backgroundColor = gaCanvas[row][col];
     }
   }
 }
 
+function wait(ms) {
+  const d = new Date();
+  let d2 = null;
+  do {
+    d2 = new Date();
+  } while ((d2 - d) < ms);
+}
+
 /* =================================================
-*  floodFill(r)
+*  floodFill()
 *
-*
+*  @param row - row of cell to try to flood fill
+*  @param col - col of cell to try to flood fill
 *  ================================================= */
-function floodFill(row, col) {
-  
+function floodFill(row, col, sReplaceColor) {
+  // console.log("FF: "+row+", "+col+"  change to: "+sReplaceColor);
+  if (row < 0 || SZ_CANVAS <= row
+    || col < 0 || SZ_CANVAS <= col) {
+    // console.log("-- oob");
+    return;
+  }
+  // console.log("-- curr color: "+gaCanvas[row][col]);
+  if (gaCanvas[row][col] !== sReplaceColor) {
+    // console.log("-- not repl color");
+    return;
+  }
+  gaCanvas[row][col] = gsCurrColor;
+  // setTimeout(renderCanvas(), 5);
+  // setTimeout(floodFill(row, col - 1), 20);
+  // setTimeout(floodFill(row, col + 1), 20);
+  // setTimeout(floodFill(row - 1, col, 20));
+  // setTimeout(floodFill(row + 1, col, 20));
+  floodFill(row, col - 1, sReplaceColor);
+  floodFill(row, col + 1, sReplaceColor);
+  floodFill(row - 1, col, sReplaceColor);
+  floodFill(row + 1, col, sReplaceColor);
 }
 
 /* =================================================
@@ -193,7 +222,9 @@ function floodFill(row, col) {
 function onmousedownCanvas(e) {
   console.log("down");
   if (e.metaKey && e.target.classList.contains("canvas--pixel")) {
-    floodFill(e.target.dataset.row, e.target.dataset.col);
+    const row = parseInt(e.target.dataset.row, 10);
+    const col = parseInt(e.target.dataset.col, 10);
+    floodFill(row, col, gaCanvas[row][col]);
     renderCanvas();
   }
 }
