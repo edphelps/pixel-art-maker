@@ -10,10 +10,17 @@ const SZ_CANVAS = 25;
 const DEFAULT_COLOR = "white";
 
 // model of the canvas, stores the color for each pixel
-const aCanvas = [];
+const gaCanvas = []; // initialized in init()
+
+// Canvas and Palette elements
+let gelemCanvas = null;
+let gelemPalette = null;
+
+// canvas mouse status
+// let gbCanvasMouseDown = false;
 
 // the palette of colors user can choose from
-let aPalette = ['white', 'black', 'grey', 'yellow', 'red', 'blue', 'green',
+const aPalette = ['white', 'black', 'grey', 'yellow', 'red', 'blue', 'green',
   'brown', 'pink', 'orange', 'purple'];
 
 // the current color selection
@@ -22,16 +29,16 @@ let sCurrColor = 'black';
 /* =================================================
 *  getCanvasElem()
 *  ================================================= */
-function getCanvasElem() {
-  return document.getElementById('canvas');
-}
+// function getCanvasElem() {
+//   return document.getElementById('canvas');
+// }
 
 /* =================================================
 *  getPaletteElem()
 *  ================================================= */
-function getPaletteElem() {
-  return document.getElementById('palette');
-}
+// function getPaletteElem() {
+//   return document.getElementById('palette');
+// }
 
 /* =================================================
 *  createPixelElem()
@@ -40,10 +47,10 @@ function getPaletteElem() {
 *  @return new pixel element
 *  ================================================= */
 function createPixelElem(row, col) {
-  let elemPixel = document.createElement('div');
+  const elemPixel = document.createElement('div');
 
   elemPixel.classList.add('canvas--pixel');
-  elemPixel.style.backgroundColor = aCanvas[row][col];
+  elemPixel.style.backgroundColor = gaCanvas[row][col];
   elemPixel.dataset.row = row;
   elemPixel.dataset.col = col;
 
@@ -57,7 +64,7 @@ function createPixelElem(row, col) {
 *  @return new row of pixels element
 *  ================================================= */
 function createRowElem(row) {
-  let elemRow = document.createElement('div');
+  const elemRow = document.createElement('div');
   elemRow.classList.add("canvas--row");
   for (let col = 0; col < SZ_CANVAS; col++) {
     elemRow.appendChild(createPixelElem(row, col));
@@ -68,13 +75,12 @@ function createRowElem(row) {
 /* =================================================
 *  renderCanvas()
 *
-*  Regenerate the canvas from current state of aCanvas
+*  Regenerate the canvas from current state of gaCanvas
 *  ================================================= */
 function renderCanvas() {
-  let elemCanvas = getCanvasElem();
-  elemCanvas.innerHTML = "";
+  gelemCanvas.innerHTML = "";
   for (let row = 0; row < SZ_CANVAS; row++) {
-    elemCanvas.appendChild(createRowElem(row));
+    gelemCanvas.appendChild(createRowElem(row));
   }
 }
 
@@ -87,7 +93,7 @@ function renderCanvas() {
 *  @return palette color element
 *  ================================================= */
 function createPaletteColorElem(sColor) {
-  let elemPaletteColor = document.createElement('div');
+  const elemPaletteColor = document.createElement('div');
 
   elemPaletteColor.classList.add('palette--color');
   elemPaletteColor.style.backgroundColor = sColor;
@@ -102,15 +108,15 @@ function createPaletteColorElem(sColor) {
 *  Regenerate the palette
 *  ================================================= */
 function renderPalette() {
-  let elemPalette = getPaletteElem();
-  elemPalette.innerHTML = "";
-  for (let sColor of aPalette) {
-    let elemPaletteColor = createPaletteColorElem(sColor);
+  gelemPalette.innerHTML = "";
+  // for (const sColor of aPalette) {
+  aPalette.forEach((sColor) => {
+    const elemPaletteColor = createPaletteColorElem(sColor);
     if (sColor === sCurrColor) {
       elemPaletteColor.classList.add("palette--color--curr");
     }
-    elemPalette.appendChild(elemPaletteColor);
-  }
+    gelemPalette.appendChild(elemPaletteColor);
+  });
 }
 
 /* =================================================
@@ -121,15 +127,16 @@ function renderPalette() {
 function onclickCanvas(e) {
   // check that canvas click was on a pixel
   if (!e.target.classList.contains("canvas--pixel")) {
+    // clicking on edge will re-render the canvas
     renderCanvas();
     return;
   }
 
   // get row and column from the data attributes in the pixel
-  let { row, col } = e.target.dataset;
+  const { row, col } = e.target.dataset;
 
-  aCanvas[row][col] = sCurrColor;
-  e.target.style.backgroundColor = aCanvas[row][col];
+  gaCanvas[row][col] = sCurrColor;
+  e.target.style.backgroundColor = gaCanvas[row][col];
 }
 
 /* =================================================
@@ -144,7 +151,7 @@ function onclickPalette(e) {
   }
 
   // get color from the data attribute of the color
-  let { color } = e.target.dataset;
+  const { color } = e.target.dataset;
 
   sCurrColor = color;
 
@@ -152,22 +159,91 @@ function onclickPalette(e) {
 }
 
 /* =================================================
+*  onmousemoveCanvas()
+*
+*  Catch mouse movement over canvas
+*  ================================================= */
+function onmousemoveCanvas(e) {
+  // console.log(e.buttons);
+  // check that canvas click was on a pixel
+  if (e.target.classList.contains("canvas--pixel")) {
+    if (e.buttons) {
+      // get row and column from the data attributes in the pixel
+      const { row, col } = e.target.dataset;
+      gaCanvas[row][col] = sCurrColor;
+      e.target.style.backgroundColor = gaCanvas[row][col];
+    }
+  }
+}
+
+/* =================================================
+*  floodFill(r)
+*
+*
+*  ================================================= */
+function floodFill(row, col) {
+  
+}
+
+/* =================================================
+*  onmousedownCanvas()
+*
+*  Catch mouse down over canvas -- flood fill
+*  ================================================= */
+function onmousedownCanvas(e) {
+  console.log("down");
+  if (e.metaKey && e.target.classList.contains("canvas--pixel")) {
+    floodFill(e.target.dataset.row, e.target.dataset.col);
+    renderCanvas();
+  }
+}
+
+// /* =================================================
+// *  onmouseupCanvas()
+// *
+// *  Catch mouse up over canvas
+// *  ================================================= */
+// function onmouseupCanvas(e) {
+//   console.log("--up");
+//   gbCanvasMouseDown = false;
+// }
+// /* =================================================
+// *  onmouseleaveCanvas()
+// *
+// *  Catch mouse leaving  canvas
+// *  ================================================= */
+// function onmouseleaveCanvas(e) {
+//   console.log("--leaving");
+//   gbCanvasMouseDown = false;
+// }
+
+/* =================================================
 *  init()
 *  ================================================= */
 function init() {
-  // init canvas data
+
+  // init references to elements
+  // --------------------------
+  gelemCanvas = document.getElementById('canvas');
+  gelemPalette = document.getElementById('palette');
+
+  // init canvas data model
   // --------------------------
   for (let row = 0; row < SZ_CANVAS; row++) {
-    aCanvas[row] = [];
+    gaCanvas[row] = [];
     for (let col = 0; col < SZ_CANVAS; col++) {
-      aCanvas[row][col] = DEFAULT_COLOR;
+      gaCanvas[row][col] = DEFAULT_COLOR;
     }
   }
 
   // setup event handlers
   // --------------------------
-  getCanvasElem().onclick = onclickCanvas;
-  getPaletteElem().onclick = onclickPalette;
+  gelemCanvas.onclick = onclickCanvas;
+  gelemPalette.onclick = onclickPalette;
+  gelemCanvas.onmousemove = onmousemoveCanvas;
+  gelemCanvas.onmousedown = onmousedownCanvas;
+  // gelemCanvas.onmouseup = onmouseupCanvas;
+  // gelemCanvas.onmouseleave = onmouseleaveCanvas;
 }
 
 /* =================================================
@@ -176,5 +252,5 @@ function init() {
 document.addEventListener("DOMContentLoaded", () => {
   init();
   renderCanvas();
-  renderPalette()
+  renderPalette();
 });
