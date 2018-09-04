@@ -31,18 +31,18 @@ let gelemCanvas = null;
 let gelemPalette = null;
 
 // model of the canvas, stores the color for each pixel at text
-const gaCanvas = []; // initialized in init()
+let gaCanvas = []; // initialized in init()
 
 // the palette of colors user can choose from
 const aPalette = ['white', 'black', 'grey', 'yellow', 'red', 'blue', 'green',
   'brown', 'orange', 'purple'];
 
-  // default background color for canvas when initialized
-  // this color displays the grid (border on .canvas--pixel)
-  const DEFAULT_COLOR = "white";
+// default background color for canvas when initialized
+// this color displays the grid (border on .canvas--pixel)
+const DEFAULT_COLOR = "white";
 
-  // current color selection
-  let gsCurrColor = 'black';
+// current color selection
+let gsCurrColor = 'black';
 
 
 
@@ -310,6 +310,23 @@ function onkeydownDocument(e) {
 }
 
 
+function actionSave() {
+  console.log("saving");
+  window.localStorage.setItem("pixel-art--sz-canvas", SZ_CANVAS);
+  window.localStorage.setItem("pixel-art--gaCanvas", JSON.stringify(gaCanvas))
+}
+
+function actionLoad() {
+  console.log("Load");
+  const szLoadedCanvas = window.localStorage.getItem("pixel-art--sz-canvas");
+  console.log("-- saved canvas was "+szLoadedCanvas);
+  if (szLoadedCanvas!==SZ_CANVAS) {
+    alert("Saved canvas is a different format, unable to load")
+  }
+  gaCanvas = JSON.parse(window.localStorage.getItem("pixel-art--gaCanvas"));
+  renderCanvas();
+}
+
 
 /* *****************************************************************
 *  *****************************************************************
@@ -347,6 +364,9 @@ function init() {
   gelemCanvas.onmousedown = onmousedownCanvas;
 
   document.onkeydown = onkeydownDocument;
+
+  document.getElementById("btn-save").onclick = actionSave;
+  document.getElementById("btn-load").onclick = actionLoad;
 }
 
 /* =================================================
