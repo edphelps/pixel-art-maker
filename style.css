@@ -13,6 +13,22 @@ p {
   margin-bottom: 0;
 }
 
+button {
+  height: 50px;
+  width: 110px;
+
+  background-color: LightGray;
+
+  border-radius: 20px;
+  border: #808B96 3px solid;
+  box-shadow: 5px 5px 10px grey;
+}
+
+i {
+  height: 2px;
+}
+
+
 body {
   background-color: Gainsboro;
 }

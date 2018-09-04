@@ -23,6 +23,9 @@ with its row and column number that are used to help maintain the data model.
 *  *****************************************************************
 *  ***************************************************************** */
 
+// Following line prevents linter from flagging localStorage as undefined
+/* global localStorage */
+
 // canvas will be SZ_CANVAS x SZ_CANVAS "pixels"
 const SZ_CANVAS = 45;
 
@@ -273,8 +276,7 @@ function renderPalette() {
 function onclickPalette(e) {
   // check that palette click was on a palette color
   if (e.target.classList.contains("palette--color")) {
-    // get color from the data attribute of the color
-    const { color } = e.target.dataset;
+    // get color from the dataset attribute of the palette
     gsCurrColor = e.target.dataset.color;
 
     renderPalette();
@@ -312,18 +314,19 @@ function onkeydownDocument(e) {
 
 function actionSave() {
   console.log("saving");
-  window.localStorage.setItem("pixel-art--sz-canvas", SZ_CANVAS);
-  window.localStorage.setItem("pixel-art--gaCanvas", JSON.stringify(gaCanvas))
+  localStorage.setItem("pixel-art--sz-canvas", SZ_CANVAS);
+  localStorage.setItem("pixel-art--gaCanvas", JSON.stringify(gaCanvas));
 }
 
 function actionLoad() {
   console.log("Load");
-  const szLoadedCanvas = window.localStorage.getItem("pixel-art--sz-canvas");
-  console.log("-- saved canvas was "+szLoadedCanvas);
+  const szLoadedCanvas = parseInt(localStorage.getItem("pixel-art--sz-canvas"));
+  // console.log("-- saved canvas was "+szLoadedCanvas);
   if (szLoadedCanvas!==SZ_CANVAS) {
-    alert("Saved canvas is a different format, unable to load")
+    alert("Saved canvas is a different format, unable to load");
+    return;
   }
-  gaCanvas = JSON.parse(window.localStorage.getItem("pixel-art--gaCanvas"));
+  gaCanvas = JSON.parse(localStorage.getItem("pixel-art--gaCanvas"));
   renderCanvas();
 }
 
