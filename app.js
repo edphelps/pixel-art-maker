@@ -21,24 +21,34 @@ let gelemPalette = null;
 
 // the palette of colors user can choose from
 const aPalette = ['white', 'black', 'grey', 'yellow', 'red', 'blue', 'green',
-  'brown', 'pink', 'orange', 'purple'];
+  'brown', 'orange', 'purple']; /* 'pink', */
 
 // the current color selection
 let gsCurrColor = 'black';
 
-/* =================================================
-*  getCanvasElem()
-*  ================================================= */
-// function getCanvasElem() {
-//   return document.getElementById('canvas');
-// }
 
 /* =================================================
-*  getPaletteElem()
+*  setPixel()
+*
+*  @param row - row of pixel to set to sCurrColor
+*  @param col - col of pixel to set to sCurrColor
+*  @param elem - optional - pixel element to immediately set to sCurrColor
 *  ================================================= */
-// function getPaletteElem() {
-//   return document.getElementById('palette');
-// }
+function setPixel(row, col, elem) {
+  // set color in data model
+  gaCanvas[row][col] = gsCurrColor;
+
+  // set color for the HTML element
+  if (elem) {
+    const x = elem;
+    x.style.backgroundColor = gaCanvas[row][col];
+    if (gsCurrColor === DEFAULT_COLOR) {
+      x.classList.remove("canvas--pixel--colored");
+    } else {
+      x.classList.add("canvas--pixel--colored");
+    }
+  }
+}
 
 /* =================================================
 *  createPixelElem()
@@ -53,6 +63,10 @@ function createPixelElem(row, col) {
   elemPixel.style.backgroundColor = gaCanvas[row][col];
   elemPixel.dataset.row = row;
   elemPixel.dataset.col = col;
+
+  if (gaCanvas[row][col] !== DEFAULT_COLOR) {
+    elemPixel.classList.add("canvas--pixel--colored"); // remove the gray border
+  }
 
   return elemPixel;
 }
@@ -126,17 +140,14 @@ function renderPalette() {
 *  ================================================= */
 function onclickCanvas(e) {
   // check that canvas click was on a pixel
-  if (!e.target.classList.contains("canvas--pixel")) {
-    // clicking on edge will re-render the canvas
-    renderCanvas();
-    return;
+  // if (!e.target.classList.contains("canvas--pixel")) {
+  // clicking on edge will re-render the canvas
+  // renderCanvas();
+  // return;
+  // }
+  if (e.target.classList.contains("canvas--pixel")) {
+    setPixel(e.target.dataset.row, e.target.dataset.col, e.target);
   }
-
-  // get row and column from the data attributes in the pixel
-  const { row, col } = e.target.dataset;
-
-  gaCanvas[row][col] = gsCurrColor;
-  e.target.style.backgroundColor = gaCanvas[row][col];
 }
 
 /* =================================================
@@ -169,49 +180,34 @@ function onmousemoveCanvas(e) {
   if (e.target.classList.contains("canvas--pixel")) {
     if (e.buttons) {
       // get row and column from the data attributes in the pixel
-      const { row, col } = e.target.dataset;
-      gaCanvas[row][col] = gsCurrColor;
-      e.target.style.backgroundColor = gaCanvas[row][col];
+      setPixel(e.target.dataset.row, e.target.dataset.col, e.target);
     }
   }
-}
-
-function wait(ms) {
-  const d = new Date();
-  let d2 = null;
-  do {
-    d2 = new Date();
-  } while ((d2 - d) < ms);
 }
 
 /* =================================================
 *  floodFill()
 *
+*  Applies stadard recursive algorithm to flood flood fill the data model
+*
 *  @param row - row of cell to try to flood fill
 *  @param col - col of cell to try to flood fill
+*  @param sColorToReplace - the color being replaced by flood fill
 *  ================================================= */
-function floodFill(row, col, sReplaceColor) {
-  // console.log("FF: "+row+", "+col+"  change to: "+sReplaceColor);
+function floodFill(row, col, sColorToReplace) {
   if (row < 0 || SZ_CANVAS <= row
     || col < 0 || SZ_CANVAS <= col) {
-    // console.log("-- oob");
     return;
   }
-  // console.log("-- curr color: "+gaCanvas[row][col]);
-  if (gaCanvas[row][col] !== sReplaceColor) {
-    // console.log("-- not repl color");
+  if (gaCanvas[row][col] !== sColorToReplace) {
     return;
   }
-  gaCanvas[row][col] = gsCurrColor;
-  // setTimeout(renderCanvas(), 5);
-  // setTimeout(floodFill(row, col - 1), 20);
-  // setTimeout(floodFill(row, col + 1), 20);
-  // setTimeout(floodFill(row - 1, col, 20));
-  // setTimeout(floodFill(row + 1, col, 20));
-  floodFill(row, col - 1, sReplaceColor);
-  floodFill(row, col + 1, sReplaceColor);
-  floodFill(row - 1, col, sReplaceColor);
-  floodFill(row + 1, col, sReplaceColor);
+  setPixel(row, col, null);
+
+  floodFill(row, col - 1, sColorToReplace);
+  floodFill(row, col + 1, sColorToReplace);
+  floodFill(row - 1, col, sColorToReplace);
+  floodFill(row + 1, col, sColorToReplace);
 }
 
 /* =================================================
@@ -219,13 +215,18 @@ function floodFill(row, col, sReplaceColor) {
 *
 *  Catch mouse down over canvas -- flood fill
 *  ================================================= */
+// let gbInFloodFill = false;
 function onmousedownCanvas(e) {
-  console.log("down");
   if (e.metaKey && e.target.classList.contains("canvas--pixel")) {
+    // if (gbInFloodFill) {
+    //   return;
+    // }
+    // gbInFloodFill = true;
     const row = parseInt(e.target.dataset.row, 10);
     const col = parseInt(e.target.dataset.col, 10);
     floodFill(row, col, gaCanvas[row][col]);
-    renderCanvas();
+    renderCanvas(); // floodFill only changes the data model
+    // gbInFloodFill = false;
   }
 }
 
@@ -273,6 +274,22 @@ function init() {
   gelemPalette.onclick = onclickPalette;
   gelemCanvas.onmousemove = onmousemoveCanvas;
   gelemCanvas.onmousedown = onmousedownCanvas;
+  document.addEventListener(
+    'keydown', (e) => {
+      console.log(e.key);
+      if (e.key === 'Backspace') {
+        const tempCurrColor = gsCurrColor;
+        gsCurrColor = DEFAULT_COLOR;
+        for (let row = 0; row < SZ_CANVAS; row++) {
+          for (let col = 0; col < SZ_CANVAS; col++) {
+            setPixel(row, col);
+          }
+        }
+        gsCurrColor = tempCurrColor;
+        renderCanvas();
+      }
+    },
+  );
   // gelemCanvas.onmouseup = onmouseupCanvas;
   // gelemCanvas.onmouseleave = onmouseleaveCanvas;
 }

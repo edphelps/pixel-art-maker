@@ -5,6 +5,14 @@
   justify-content: center;
 }
 
+p {
+  margin-bottom: 0;
+}
+
+body {
+  background-color: Gainsboro;
+}
+
 h1 {
   margin-top: 15px;
   margin-bottom: 0;
@@ -15,17 +23,26 @@ h1 {
 }
 
 /* ============================
+*  APP (container for canvas and palette)
+*  ============================*/
+.app-container {
+  background-color: DarkGray;
+  padding: 25px;
+  margin-top: 15px;
+  border-radius: 20px;
+}
+/* ============================
 *  CANVAS
 *  ============================*/
 
 /* entire canvas */
 .canvas {
-  margin-top: 10px;
-  padding: 10px;
+  /* margin-top: 10px; */
+  /* padding: 10px; */
 
   background-color: DarkGray;
 
-  border: solid 20px DimGray;
+  /* border: solid 20px DimGray; */
   border-radius: 15px;
   /* box-shadow: 8px 8px 30px grey; */
 }
@@ -43,6 +60,12 @@ h1 {
   border: solid 1px LightGray;
 }
 
+.canvas--pixel--colored {
+  border-style: none;
+  height: 17px;
+  width: 17px;
+}
+
 /* ============================
 *  PALETTE
 *  ============================*/
@@ -51,11 +74,11 @@ h1 {
 .palette {
   margin-top: 15px;
   padding: 8px;
-  width: 437px;
+  /* width: 437px; */
 
   background-color: LightGray;
 
-  border: solid 4px black;
+  /* border: solid 4px black; */
   border-radius: 20px;
   /* box-shadow: 5px 5px 10px grey; */
   box-shadow: 8px 8px 30px grey;
@@ -70,7 +93,8 @@ h1 {
   border: solid 2px DarkGray;
   height: 31px;
   width:  31px;
-  margin-left: 4px;
+  margin-left: 2px;
+  margin-right: 2px;
   border-radius: 50%;
 }
 /* Add class to mark current color */
