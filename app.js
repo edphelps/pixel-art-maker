@@ -17,6 +17,7 @@ with its row and column number that are used to help maintain the data model.
 */
 
 
+
 /* *****************************************************************
 *  *****************************************************************
 *                              GLOBALS
@@ -25,6 +26,7 @@ with its row and column number that are used to help maintain the data model.
 
 // Following line prevents linter from flagging localStorage as undefined
 /* global localStorage */
+/* global alert */
 
 // canvas will be SZ_CANVAS x SZ_CANVAS "pixels"
 const SZ_CANVAS = 45;
@@ -46,7 +48,6 @@ const DEFAULT_COLOR = "white";
 
 // current color selection
 let gsCurrColor = 'black';
-
 
 
 /* *****************************************************************
@@ -95,6 +96,47 @@ function createRowElem(row) {
     elemRow.appendChild(createPixelElem(row, col));
   }
   return elemRow;
+}
+
+/* =================================================
+*  renderCanvas()
+*
+*  Regenerate the canvas from current state of gaCanvas
+*  ================================================= */
+function renderCanvas() {
+  gelemCanvas.innerHTML = ""; // delete existing canvas
+  for (let row = 0; row < SZ_CANVAS; row++) {
+    gelemCanvas.appendChild(createRowElem(row));
+  }
+}
+
+/* =================================================
+*  actionLoad()
+*
+*  Save the canvas to localStorage
+*  ================================================= */
+function actionSave() {
+  localStorage.setItem("pixel-art--sz-canvas", SZ_CANVAS);
+  localStorage.setItem("pixel-art--gaCanvas", JSON.stringify(gaCanvas));
+}
+
+/* =================================================
+*  actionLoad()
+*
+*  Load canvas from localStorage and re-render the canvas
+*  ================================================= */
+function actionLoad() {
+  const szLoadedCanvas = parseInt(localStorage.getItem("pixel-art--sz-canvas"), 10);
+  if (!szLoadedCanvas) {
+    alert("You must save a canvas before trying to reload it");
+    return;
+  }
+  if (szLoadedCanvas !== SZ_CANVAS) {
+    alert("Saved canvas is a different format, unable to load");
+    return;
+  }
+  gaCanvas = JSON.parse(localStorage.getItem("pixel-art--gaCanvas"));
+  renderCanvas();
 }
 
 /* =================================================
@@ -211,18 +253,6 @@ function onmousedownCanvas(e) {
   }
 }
 
-/* =================================================
-*  renderCanvas()
-*
-*  Regenerate the canvas from current state of gaCanvas
-*  ================================================= */
-function renderCanvas() {
-  gelemCanvas.innerHTML = ""; // delete existing canvas
-  for (let row = 0; row < SZ_CANVAS; row++) {
-    gelemCanvas.appendChild(createRowElem(row));
-  }
-}
-
 
 
 /* *****************************************************************
@@ -311,24 +341,6 @@ function onkeydownDocument(e) {
   }
 }
 
-
-function actionSave() {
-  console.log("saving");
-  localStorage.setItem("pixel-art--sz-canvas", SZ_CANVAS);
-  localStorage.setItem("pixel-art--gaCanvas", JSON.stringify(gaCanvas));
-}
-
-function actionLoad() {
-  console.log("Load");
-  const szLoadedCanvas = parseInt(localStorage.getItem("pixel-art--sz-canvas"));
-  // console.log("-- saved canvas was "+szLoadedCanvas);
-  if (szLoadedCanvas!==SZ_CANVAS) {
-    alert("Saved canvas is a different format, unable to load");
-    return;
-  }
-  gaCanvas = JSON.parse(localStorage.getItem("pixel-art--gaCanvas"));
-  renderCanvas();
-}
 
 
 /* *****************************************************************

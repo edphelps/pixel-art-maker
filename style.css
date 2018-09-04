@@ -11,11 +11,14 @@
 
 p {
   margin-bottom: 0;
+  color: DarkBlue;
+  font-size: 18px;
 }
 
 button {
   height: 50px;
   width: 110px;
+  margin-top: 15px;
 
   background-color: LightGray;
 
@@ -24,10 +27,14 @@ button {
   box-shadow: 5px 5px 10px grey;
 }
 
-i {
-  height: 2px;
+button:focus {
+  border-color: black;
+  outline: 0; /* remove the blue box around the button */
 }
 
+button:focus {
+  outline:0; // remove blue box around button added by browser
+}
 
 body {
   background-color: Gainsboro;
@@ -48,7 +55,7 @@ h1 {
 *  ============================*/
 .app-container {
   margin-top: 15px;
-  padding: 25px;
+  padding: 25px 25px 15px 25px;
 
   background-color: DarkGray;
 
