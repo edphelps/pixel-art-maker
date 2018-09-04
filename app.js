@@ -4,7 +4,7 @@
 *  ================================================= */
 
 // canvas will be SZ_CANVAS x SZ_CANVAS "pixels"
-const SZ_CANVAS = 25;
+const SZ_CANVAS = 45;
 
 // default background color for canvas when initialized
 const DEFAULT_COLOR = "white";
@@ -195,6 +195,9 @@ function onmousemoveCanvas(e) {
 *  @param sColorToReplace - the color being replaced by flood fill
 *  ================================================= */
 function floodFill(row, col, sColorToReplace) {
+  if (sColorToReplace === gsCurrColor) {
+    return; // nothing to do
+  }
   if (row < 0 || SZ_CANVAS <= row
     || col < 0 || SZ_CANVAS <= col) {
     return;
@@ -276,7 +279,6 @@ function init() {
   gelemCanvas.onmousedown = onmousedownCanvas;
   document.addEventListener(
     'keydown', (e) => {
-      console.log(e.key);
       if (e.key === 'Backspace') {
         const tempCurrColor = gsCurrColor;
         gsCurrColor = DEFAULT_COLOR;
