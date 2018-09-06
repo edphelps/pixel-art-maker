@@ -140,7 +140,7 @@ function actionLoad() {
 }
 
 /* =================================================
-*  setPixel()
+*  setPixelToCurrColor()
 *
 *  Set specific pixel to the current color in data model.
 *  Optionally update the pixel in the DOM.
@@ -148,9 +148,10 @@ function actionLoad() {
 *  @param row - row of pixel to set to gsCurrColor
 *  @param col - col of pixel to set to gsCurrColor
 *  @param elem - optional - pixel element to set to gsCurrColor
-*                If DOM not updated here then renderCanvas needs to be called.
+*                If elem not passed then DOM isn't update and caller
+*                will need to eventually call renderCanvas.
 *  ================================================= */
-function setPixel(row, col, elem) {
+function setPixelToCurrColor(row, col, elem) {
   // set color in data model
   gaCanvas[row][col] = gsCurrColor;
 
@@ -177,7 +178,7 @@ function setPixel(row, col, elem) {
 function onclickCanvas(e) {
   // check that canvas click was on a pixel
   if (e.target.classList.contains("canvas--pixel")) {
-    setPixel(e.target.dataset.row,
+    setPixelToCurrColor(e.target.dataset.row,
       e.target.dataset.col,
       e.target);
   }
@@ -194,7 +195,7 @@ function onmousemoveCanvas(e) {
   if (e.target.classList.contains("canvas--pixel")) {
     // if a mouse button is down
     if (e.buttons) {
-      setPixel(e.target.dataset.row,
+      setPixelToCurrColor(e.target.dataset.row,
         e.target.dataset.col,
         e.target);
     }
@@ -226,7 +227,7 @@ function floodFill(row, col, sColorToReplace) {
     return;
   }
 
-  setPixel(row, col, null);
+  setPixelToCurrColor(row, col, null);
 
   floodFill(row, col - 1, sColorToReplace);
   floodFill(row, col + 1, sColorToReplace);
@@ -333,7 +334,7 @@ function onkeydownDocument(e) {
     gsCurrColor = DEFAULT_COLOR;
     for (let row = 0; row < SZ_CANVAS; row++) {
       for (let col = 0; col < SZ_CANVAS; col++) {
-        setPixel(row, col);
+        setPixelToCurrColor(row, col);
       }
     }
     gsCurrColor = tempCurrColor; // reset the current color
